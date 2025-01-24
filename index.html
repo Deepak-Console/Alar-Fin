@@ -6,10 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Estimate Card Generator</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 </head>
 
 <body class="bg-gray-100 font-sans">
-
     <div class="container p-6 w-full max-w-4xl mx-auto">
         <!-- Language Toggle -->
         <div class="flex justify-end mb-4">
@@ -29,52 +30,42 @@
             <form id="estimateCardForm" class="space-y-4">
                 <div>
                     <label id="groupNameLabel" class="block font-semibold mb-1">Group Name</label>
-                    <input id="groupName" type="text"
-                        class="w-full p-3 border border-gray-300 rounded focus:outline-blue-500" required>
+                    <input id="groupName" type="text" class="w-full p-3 border border-gray-300 rounded focus:outline-blue-500" required>
                 </div>
 
                 <div>
                     <label id="bidAmountLabel" class="block font-semibold mb-1">Final Bid Amount</label>
-                    <input id="bidAmount" type="number"
-                        class="w-full p-3 border border-gray-300 rounded focus:outline-blue-500" required>
+                    <input id="bidAmount" type="number" class="w-full p-3 border border-gray-300 rounded focus:outline-blue-500" required>
                 </div>
 
                 <div>
                     <label id="companyNameLabel" class="block font-semibold mb-1">Company Name</label>
-                    <input id="companyName" type="text"
-                        class="w-full p-3 border border-gray-300 rounded focus:outline-blue-500" required>
+                    <input id="companyName" type="text" class="w-full p-3 border border-gray-300 rounded focus:outline-blue-500" required>
                 </div>
 
                 <div>
                     <label id="chitAmountLabel" class="block font-semibold mb-1">Chit Amount</label>
-                    <input id="chitAmount" type="number"
-                        class="w-full p-3 border border-gray-300 rounded focus:outline-blue-500" required>
+                    <input id="chitAmount" type="number" class="w-full p-3 border border-gray-300 rounded focus:outline-blue-500" required>
                 </div>
 
                 <div>
                     <label id="payableAmountLabel" class="block font-semibold mb-1">Payable Amount</label>
-                    <input id="payableAmount" type="number"
-                        class="w-full p-3 border border-gray-300 rounded focus:outline-blue-500" required>
+                    <input id="payableAmount" type="number" class="w-full p-3 border border-gray-300 rounded focus:outline-blue-500" required>
                 </div>
 
                 <div>
                     <label id="monthCountLabel" class="block font-semibold mb-1">Current Month Count</label>
-                    <input id="monthCount" type="number"
-                        class="w-full p-3 border border-gray-300 rounded focus:outline-blue-500" required>
+                    <input id="monthCount" type="number" class="w-full p-3 border border-gray-300 rounded focus:outline-blue-500" required>
                 </div>
 
                 <div>
                     <label id="dateTimeLabel" class="block font-semibold mb-1">Date & Time</label>
-                    <input id="dateTime" type="datetime-local"
-                        class="w-full p-3 border border-gray-300 rounded focus:outline-blue-500" required>
+                    <input id="dateTime" type="datetime-local" class="w-full p-3 border border-gray-300 rounded focus:outline-blue-500" required>
                 </div>
 
                 <div>
                     <label id="membersInputLabel" class="block font-semibold mb-1">Members (comma-separated)</label>
-                    <textarea id="membersInput" rows="4"
-                        class="w-full p-3 border border-gray-300 rounded focus:outline-blue-500"
-                        placeholder="Enter member names separated by commas (e.g., John, Jane, Smith)"
-                        required></textarea>
+                    <textarea id="membersInput" rows="4" class="w-full p-3 border border-gray-300 rounded focus:outline-blue-500" placeholder="Enter member names separated by commas (e.g., John, Jane, Smith)" required></textarea>
                 </div>
 
                 <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700">
@@ -84,9 +75,7 @@
         </div>
     </div>
     <!-- Generated Cards -->
-    <div id="estimateCards" class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full h-full p-6">
-
-    </div>
+    <div id="estimateCards" class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full h-full p-6"></div>
 
     <script>
         const form = document.getElementById('estimateCardForm');
@@ -152,7 +141,6 @@
         form.addEventListener('submit', (event) => {
             event.preventDefault();
 
-            // Fetch values from the form
             const groupName = document.getElementById('groupName').value;
             const bidAmount = document.getElementById('bidAmount').value;
             const companyName = document.getElementById('companyName').value;
@@ -162,20 +150,16 @@
             const dateTime = document.getElementById('dateTime').value;
             const membersInput = document.getElementById('membersInput').value;
 
-            // Split members by comma
             const members = membersInput.split(',').map(member => member.trim());
-
-            // Clear existing cards
             estimateCardsContainer.innerHTML = '';
 
-            // Generate cards for each member
             members.forEach(member => {
                 const card = document.createElement('div');
                 card.className = "bg-white p-6 shadow-lg rounded-lg border";
 
                 card.innerHTML = `
                     <h2 class="text-xl font-bold text-gray-800 mb-4 text-center">${companyName}</h2>
-                    <p class="text-gray-700"><strong>Customer Name:</strong>${member}</p>
+                    <p class="text-gray-700"><strong>Customer Name:</strong> ${member}</p>
                     <p class="text-gray-700"><strong>Group Name:</strong> ${groupName}</p>
                     <p class="text-gray-700"><strong>Chit Amount:</strong> ₹${chitAmount}</p>
                     <p class="text-gray-700"><strong>Final Bid Amount:</strong> ₹${bidAmount}</p>
@@ -186,6 +170,30 @@
 
                 estimateCardsContainer.appendChild(card);
             });
+        });
+
+        const downloadButton = document.createElement('button');
+        downloadButton.textContent = 'Download as PDF';
+        downloadButton.className = 'w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 mt-4';
+        estimateCardsContainer.parentElement.appendChild(downloadButton);
+
+        downloadButton.addEventListener('click', async () => {
+            const jsPDF = window.jspdf.jsPDF;
+            const pdf = new jsPDF();
+            const cards = estimateCardsContainer.children;
+            const options = { scale: 1.5 };
+
+            for (let i = 0; i < cards.length; i++) {
+                const canvas = await html2canvas(cards[i], options);
+                const imgData = canvas.toDataURL('image/png');
+                const imgWidth = pdf.internal.pageSize.getWidth();
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+                if (i > 0) pdf.addPage();
+                pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+            }
+
+            pdf.save('EstimateCards.pdf');
         });
 
         translatePage();
