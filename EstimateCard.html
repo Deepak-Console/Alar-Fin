@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estimate Card Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 font-sans">
+
+    <div class="container p-6 w-full max-w-4xl mx-auto">
+        <!-- Language Toggle -->
+        <div class="flex justify-end mb-4">
+            <button id="toggleLanguage" class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700">
+                தமிழ்
+            </button>
+        </div>
+
+        <header class="mb-8 text-center">
+            <h1 id="title" class="text-4xl font-bold text-blue-700">Estimate Card Generator</h1>
+            <p id="subtitle" class="text-gray-600">Generate Estimate Cards for Group Members</p>
+        </header>
+
+        <!-- Estimate Card Form -->
+        <div class="bg-white shadow-lg rounded-lg p-6 w-full mx-auto">
+            <h2 id="formTitle" class="text-2xl font-bold mb-4">Enter Group Details</h2>
+            <form id="estimateCardForm" class="space-y-4">
+                <div>
+                    <label id="groupNameLabel" class="block font-semibold mb-1">Group Name</label>
+                    <input id="groupName" type="text"
+                        class="w-full p-3 border border-gray-300 rounded focus:outline-blue-500" required>
+                </div>
+
+                <div>
+                    <label id="bidAmountLabel" class="block font-semibold mb-1">Final Bid Amount</label>
+                    <input id="bidAmount" type="number"
+                        class="w-full p-3 border border-gray-300 rounded focus:outline-blue-500" required>
+                </div>
+
+                <div>
+                    <label id="companyNameLabel" class="block font-semibold mb-1">Company Name</label>
+                    <input id="companyName" type="text"
+                        class="w-full p-3 border border-gray-300 rounded focus:outline-blue-500" required>
+                </div>
+
+                <div>
+                    <label id="chitAmountLabel" class="block font-semibold mb-1">Chit Amount</label>
+                    <input id="chitAmount" type="number"
+                        class="w-full p-3 border border-gray-300 rounded focus:outline-blue-500" required>
+                </div>
+
+                <div>
+                    <label id="payableAmountLabel" class="block font-semibold mb-1">Payable Amount</label>
+                    <input id="payableAmount" type="number"
+                        class="w-full p-3 border border-gray-300 rounded focus:outline-blue-500" required>
+                </div>
+
+                <div>
+                    <label id="monthCountLabel" class="block font-semibold mb-1">Current Month Count</label>
+                    <input id="monthCount" type="number"
+                        class="w-full p-3 border border-gray-300 rounded focus:outline-blue-500" required>
+                </div>
+
+                <div>
+                    <label id="dateTimeLabel" class="block font-semibold mb-1">Date & Time</label>
+                    <input id="dateTime" type="datetime-local"
+                        class="w-full p-3 border border-gray-300 rounded focus:outline-blue-500" required>
+                </div>
+
+                <div>
+                    <label id="membersInputLabel" class="block font-semibold mb-1">Members (comma-separated)</label>
+                    <textarea id="membersInput" rows="4"
+                        class="w-full p-3 border border-gray-300 rounded focus:outline-blue-500"
+                        placeholder="Enter member names separated by commas (e.g., John, Jane, Smith)"
+                        required></textarea>
+                </div>
+
+                <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700">
+                    Generate Estimate Cards
+                </button>
+            </form>
+        </div>
+    </div>
+    <!-- Generated Cards -->
+    <div id="estimateCards" class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full h-full p-6">
+
+    </div>
+
+    <script>
+        const form = document.getElementById('estimateCardForm');
+        const estimateCardsContainer = document.getElementById('estimateCards');
+        const toggleLanguageButton = document.getElementById('toggleLanguage');
+
+        const translations = {
+            english: {
+                title: 'Estimate Card Generator',
+                subtitle: 'Generate Estimate Cards for Group Members',
+                formTitle: 'Enter Group Details',
+                groupNameLabel: 'Group Name',
+                bidAmountLabel: 'Final Bid Amount',
+                companyNameLabel: 'Company Name',
+                chitAmountLabel: 'Chit Amount',
+                payableAmountLabel: 'Payable Amount',
+                monthCountLabel: 'Current Month Count',
+                dateTimeLabel: 'Date & Time',
+                membersInputLabel: 'Members (comma-separated)',
+                buttonText: 'Generate Estimate Cards',
+            },
+            tamil: {
+                title: 'எஸ்டிமேட் அட்டை ஜெனரேட்டர்',
+                subtitle: 'குழு உறுப்பினர்களுக்கான எஸ்டிமேட் அட்டைகள் உருவாக்கவும்',
+                formTitle: 'குழு விவரங்களை உள்ளிடவும்',
+                groupNameLabel: 'குழு பெயர்',
+                bidAmountLabel: 'இறுதி ஏல தொகை',
+                companyNameLabel: 'கம்பெனி பெயர்',
+                chitAmountLabel: 'சிட்டு தொகை',
+                payableAmountLabel: 'கட்ட வேண்டிய தொகை',
+                monthCountLabel: 'தற்போதைய மாத எண்ணிக்கை',
+                dateTimeLabel: 'தேதி & நேரம்',
+                membersInputLabel: 'உறுப்பினர்கள் (காமா மூலம் பிரிக்கவும்)',
+                buttonText: 'எஸ்டிமேட் அட்டைகள் உருவாக்கவும்',
+            }
+        };
+
+        let currentLanguage = 'english';
+
+        function translatePage() {
+            const translation = translations[currentLanguage];
+
+            document.getElementById('title').textContent = translation.title;
+            document.getElementById('subtitle').textContent = translation.subtitle;
+            document.getElementById('formTitle').textContent = translation.formTitle;
+            document.getElementById('groupNameLabel').textContent = translation.groupNameLabel;
+            document.getElementById('bidAmountLabel').textContent = translation.bidAmountLabel;
+            document.getElementById('companyNameLabel').textContent = translation.companyNameLabel;
+            document.getElementById('chitAmountLabel').textContent = translation.chitAmountLabel;
+            document.getElementById('payableAmountLabel').textContent = translation.payableAmountLabel;
+            document.getElementById('monthCountLabel').textContent = translation.monthCountLabel;
+            document.getElementById('dateTimeLabel').textContent = translation.dateTimeLabel;
+            document.getElementById('membersInputLabel').textContent = translation.membersInputLabel;
+            toggleLanguageButton.textContent = currentLanguage === 'english' ? 'தமிழ்' : 'English';
+            document.querySelector('button[type="submit"]').textContent = translation.buttonText;
+        }
+
+        toggleLanguageButton.addEventListener('click', () => {
+            currentLanguage = currentLanguage === 'english' ? 'tamil' : 'english';
+            translatePage();
+        });
+
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            // Fetch values from the form
+            const groupName = document.getElementById('groupName').value;
+            const bidAmount = document.getElementById('bidAmount').value;
+            const companyName = document.getElementById('companyName').value;
+            const chitAmount = document.getElementById('chitAmount').value;
+            const payableAmount = document.getElementById('payableAmount').value;
+            const monthCount = document.getElementById('monthCount').value;
+            const dateTime = document.getElementById('dateTime').value;
+            const membersInput = document.getElementById('membersInput').value;
+
+            // Split members by comma
+            const members = membersInput.split(',').map(member => member.trim());
+
+            // Clear existing cards
+            estimateCardsContainer.innerHTML = '';
+
+            // Generate cards for each member
+            members.forEach(member => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-6 shadow-lg rounded-lg border";
+
+                card.innerHTML = `
+                    <h2 class="text-xl font-bold text-gray-800 mb-4 text-center">${companyName}</h2>
+                    <p class="text-gray-700"><strong>Customer Name:</strong>${member}</p>
+                    <p class="text-gray-700"><strong>Group Name:</strong> ${groupName}</p>
+                    <p class="text-gray-700"><strong>Chit Amount:</strong> ₹${chitAmount}</p>
+                    <p class="text-gray-700"><strong>Final Bid Amount:</strong> ₹${bidAmount}</p>
+                    <p class="text-gray-700"><strong>Payable Amount:</strong> ₹${payableAmount}</p>
+                    <p class="text-gray-700"><strong>Current Month Count:</strong> ${monthCount}</p>
+                    <p class="text-gray-700"><strong>Date & Time:</strong> ${new Date(dateTime).toLocaleString()}</p>
+                `;
+
+                estimateCardsContainer.appendChild(card);
+            });
+        });
+
+        translatePage();
+    </script>
+</body>
+
+</html>
