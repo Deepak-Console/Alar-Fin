@@ -88,6 +88,48 @@
         const form = document.getElementById('estimateCardForm');
         const estimateCardsContainer = document.getElementById('estimateCards');
         const downloadPDFButton = document.getElementById('downloadPDF');
+        const toggleLanguageButton = document.getElementById('toggleLanguage');
+
+        let isTamil = false; // Keep track of the language state
+
+        // Toggle language on button click
+        toggleLanguageButton.addEventListener('click', () => {
+            isTamil = !isTamil;
+            updateLanguage();
+        });
+
+        // Function to update language based on isTamil flag
+        function updateLanguage() {
+            if (isTamil) {
+                document.getElementById('title').textContent = 'எஸ்டிமேட் கார்டு ஜெனரேட்டர்';
+                document.getElementById('subtitle').textContent = 'குழு உறுப்பினர்களுக்கான எஸ்டிமேட் கார்டுகளை உருவாக்கவும்';
+                document.getElementById('formTitle').textContent = 'குழு விவரங்களை உள்ளிடவும்';
+                document.getElementById('groupNameLabel').textContent = 'குழு பெயர்';
+                document.getElementById('bidAmountLabel').textContent = 'கடைசி விலை தொகை';
+                document.getElementById('companyNameLabel').textContent = 'நிறுவனத்தின் பெயர்';
+                document.getElementById('chitAmountLabel').textContent = 'சிட் தொகை';
+                document.getElementById('payableAmountLabel').textContent = 'பணம் செலுத்த வேண்டிய தொகை';
+                document.getElementById('monthCountLabel').textContent = 'தற்போதைய மாத எண்ணிக்கை';
+                document.getElementById('dateTimeLabel').textContent = 'தேதி மற்றும் நேரம்';
+                document.getElementById('membersInputLabel').textContent = 'உறுப்பினர்கள் (காமா மூலம் வேறுபடுத்தவும்)';
+                document.querySelector('button[type="submit"]').textContent = 'எஸ்டிமேட் கார்டுகளை உருவாக்கவும்';
+                document.getElementById('downloadPDF').textContent = 'PDF ஆக பதிவிறக்கவும்';
+            } else {
+                document.getElementById('title').textContent = 'Estimate Card Generator';
+                document.getElementById('subtitle').textContent = 'Generate Estimate Cards for Group Members';
+                document.getElementById('formTitle').textContent = 'Enter Group Details';
+                document.getElementById('groupNameLabel').textContent = 'Group Name';
+                document.getElementById('bidAmountLabel').textContent = 'Final Bid Amount';
+                document.getElementById('companyNameLabel').textContent = 'Company Name';
+                document.getElementById('chitAmountLabel').textContent = 'Chit Amount';
+                document.getElementById('payableAmountLabel').textContent = 'Payable Amount';
+                document.getElementById('monthCountLabel').textContent = 'Current Month Count';
+                document.getElementById('dateTimeLabel').textContent = 'Date & Time';
+                document.getElementById('membersInputLabel').textContent = 'Members (comma-separated)';
+                document.querySelector('button[type="submit"]').textContent = 'Generate Estimate Cards';
+                document.getElementById('downloadPDF').textContent = 'Download as PDF';
+            }
+        }
 
         form.addEventListener('submit', (event) => {
             event.preventDefault();
@@ -113,13 +155,13 @@
                         <h2 class="text-xl font-bold text-blue-700 mb-4">${companyName}</h2>
                     </div>
                     <div class="flex flex-col gap-2 text-gray-700">
-                        <p><strong>Customer Name:</strong> ${member}</p>
-                        <p><strong>Group Name:</strong> ${groupName}</p>
-                        <p><strong>Chit Amount:</strong> ₹${chitAmount}</p>
-                        <p><strong>Final Bid Amount:</strong> ₹${bidAmount}</p>
-                        <p><strong>Payable Amount:</strong> ₹${payableAmount}</p>
-                        <p><strong>Current Month Count:</strong> ${monthCount}</p>
-                        <p><strong>Date & Time:</strong> ${new Date(dateTime).toLocaleString()}</p>
+                        <p><strong>${isTamil ? 'உறுப்பினர் பெயர்' : 'Customer Name'}:</strong> ${member}</p>
+                        <p><strong>${isTamil ? 'குழு பெயர்' : 'Group Name'}:</strong> ${groupName}</p>
+                        <p><strong>${isTamil ? 'சிட் தொகை' : 'Chit Amount'}:</strong> ₹${chitAmount}</p>
+                        <p><strong>${isTamil ? 'கடைசி விலை தொகை' : 'Final Bid Amount'}:</strong> ₹${bidAmount}</p>
+                        <p><strong>${isTamil ? 'பணம் செலுத்த வேண்டிய தொகை' : 'Payable Amount'}:</strong> ₹${payableAmount}</p>
+                        <p><strong>${isTamil ? 'தற்போதைய மாத எண்ணிக்கை' : 'Current Month Count'}:</strong> ${monthCount}</p>
+                        <p><strong>${isTamil ? 'தேதி மற்றும் நேரம்' : 'Date & Time'}:</strong> ${new Date(dateTime).toLocaleString()}</p>
                     </div>
                 `;
 
