@@ -77,66 +77,17 @@
     <!-- Generated Cards -->
     <div id="estimateCards" class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full h-full p-6"></div>
 
+    <div class="mt-6 text-center">
+        <button id="downloadPDF" class="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700">
+            Download as PDF
+        </button>
+    </div>
+
     <script>
         const form = document.getElementById('estimateCardForm');
         const estimateCardsContainer = document.getElementById('estimateCards');
+        const downloadPDFButton = document.getElementById('downloadPDF');
         const toggleLanguageButton = document.getElementById('toggleLanguage');
-
-        const translations = {
-            english: {
-                title: 'Estimate Card Generator',
-                subtitle: 'Generate Estimate Cards for Group Members',
-                formTitle: 'Enter Group Details',
-                groupNameLabel: 'Group Name',
-                bidAmountLabel: 'Final Bid Amount',
-                companyNameLabel: 'Company Name',
-                chitAmountLabel: 'Chit Amount',
-                payableAmountLabel: 'Payable Amount',
-                monthCountLabel: 'Current Month Count',
-                dateTimeLabel: 'Date & Time',
-                membersInputLabel: 'Members (comma-separated)',
-                buttonText: 'Generate Estimate Cards',
-            },
-            tamil: {
-                title: 'எஸ்டிமேட் அட்டை ஜெனரேட்டர்',
-                subtitle: 'குழு உறுப்பினர்களுக்கான எஸ்டிமேட் அட்டைகள் உருவாக்கவும்',
-                formTitle: 'குழு விவரங்களை உள்ளிடவும்',
-                groupNameLabel: 'குழு பெயர்',
-                bidAmountLabel: 'இறுதி ஏல தொகை',
-                companyNameLabel: 'கம்பெனி பெயர்',
-                chitAmountLabel: 'சிட்டு தொகை',
-                payableAmountLabel: 'கட்ட வேண்டிய தொகை',
-                monthCountLabel: 'தற்போதைய மாத எண்ணிக்கை',
-                dateTimeLabel: 'தேதி & நேரம்',
-                membersInputLabel: 'உறுப்பினர்கள் (காமா மூலம் பிரிக்கவும்)',
-                buttonText: 'எஸ்டிமேட் அட்டைகள் உருவாக்கவும்',
-            }
-        };
-
-        let currentLanguage = 'english';
-
-        function translatePage() {
-            const translation = translations[currentLanguage];
-
-            document.getElementById('title').textContent = translation.title;
-            document.getElementById('subtitle').textContent = translation.subtitle;
-            document.getElementById('formTitle').textContent = translation.formTitle;
-            document.getElementById('groupNameLabel').textContent = translation.groupNameLabel;
-            document.getElementById('bidAmountLabel').textContent = translation.bidAmountLabel;
-            document.getElementById('companyNameLabel').textContent = translation.companyNameLabel;
-            document.getElementById('chitAmountLabel').textContent = translation.chitAmountLabel;
-            document.getElementById('payableAmountLabel').textContent = translation.payableAmountLabel;
-            document.getElementById('monthCountLabel').textContent = translation.monthCountLabel;
-            document.getElementById('dateTimeLabel').textContent = translation.dateTimeLabel;
-            document.getElementById('membersInputLabel').textContent = translation.membersInputLabel;
-            toggleLanguageButton.textContent = currentLanguage === 'english' ? 'தமிழ்' : 'English';
-            document.querySelector('button[type="submit"]').textContent = translation.buttonText;
-        }
-
-        toggleLanguageButton.addEventListener('click', () => {
-            currentLanguage = currentLanguage === 'english' ? 'tamil' : 'english';
-            translatePage();
-        });
 
         form.addEventListener('submit', (event) => {
             event.preventDefault();
@@ -155,8 +106,7 @@
 
             members.forEach(member => {
                 const card = document.createElement('div');
-                card.className = "bg-white p-6 shadow-lg rounded-lg border";
-
+                card.className = "bg-white p-6 shadow-lg rounded-lg border w-full";
                 card.innerHTML = `
                     <h2 class="text-xl font-bold text-gray-800 mb-4 text-center">${companyName}</h2>
                     <p class="text-gray-700"><strong>Customer Name:</strong> ${member}</p>
@@ -167,36 +117,45 @@
                     <p class="text-gray-700"><strong>Current Month Count:</strong> ${monthCount}</p>
                     <p class="text-gray-700"><strong>Date & Time:</strong> ${new Date(dateTime).toLocaleString()}</p>
                 `;
-
                 estimateCardsContainer.appendChild(card);
             });
         });
 
-        const downloadButton = document.createElement('button');
-        downloadButton.textContent = 'Download as PDF';
-        downloadButton.className = 'w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 mt-4';
-        estimateCardsContainer.parentElement.appendChild(downloadButton);
-
-        downloadButton.addEventListener('click', async () => {
+        downloadPDFButton.addEventListener('click', async () => {
             const jsPDF = window.jspdf.jsPDF;
-            const pdf = new jsPDF();
-            const cards = estimateCardsContainer.children;
-            const options = { scale: 1.5 };
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const cards = document.querySelectorAll('#estimateCards > div');
+            const margin = 10;
+            const cardWidth = (pdf.internal.pageSize.getWidth() - margin * 3) / 2;
+            const cardHeight = 60; // Height of each card
+            const rowsPerPage = 4; // Rows per page
+            let xOffset = margin, yOffset = margin;
 
-            for (let i = 0; i < cards.length; i++) {
-                const canvas = await html2canvas(cards[i], options);
-                const imgData = canvas.toDataURL('image/png');
-                const imgWidth = pdf.internal.pageSize.getWidth();
-                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            cards.forEach((card, index) => {
+                if (index > 0 && index % (2 * rowsPerPage) === 0) {
+                    pdf.addPage();
+                    xOffset = margin;
+                    yOffset = margin;
+                } else if (index > 0 && index % 2 === 0) {
+                    xOffset = margin;
+                    yOffset += cardHeight + margin;
+                } else if (index > 0) {
+                    xOffset += cardWidth + margin;
+                }
 
-                if (i > 0) pdf.addPage();
-                pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-            }
+                const canvas = document.createElement('canvas');
+                canvas.width = cardWidth * 4;
+                canvas.height = cardHeight * 4;
+                const ctx = canvas.getContext('2d');
+                ctx.scale(4, 4);
 
-            pdf.save('EstimateCards.pdf');
+                html2canvas(card, { canvas }).then((cardCanvas) => {
+                    pdf.addImage(cardCanvas, 'PNG', xOffset, yOffset, cardWidth, cardHeight);
+                });
+            });
+
+            setTimeout(() => pdf.save('EstimateCards.pdf'), 1000); // Wait for rendering to complete
         });
-
-        translatePage();
     </script>
 </body>
 
