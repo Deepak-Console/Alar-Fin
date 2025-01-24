@@ -87,7 +87,6 @@
         const form = document.getElementById('estimateCardForm');
         const estimateCardsContainer = document.getElementById('estimateCards');
         const downloadPDFButton = document.getElementById('downloadPDF');
-        const toggleLanguageButton = document.getElementById('toggleLanguage');
 
         form.addEventListener('submit', (event) => {
             event.preventDefault();
@@ -131,30 +130,24 @@
             const rowsPerPage = 4; // Rows per page
             let xOffset = margin, yOffset = margin;
 
-            cards.forEach((card, index) => {
-                if (index > 0 && index % (2 * rowsPerPage) === 0) {
+            for (let i = 0; i < cards.length; i++) {
+                if (i > 0 && i % (2 * rowsPerPage) === 0) {
                     pdf.addPage();
                     xOffset = margin;
                     yOffset = margin;
-                } else if (index > 0 && index % 2 === 0) {
+                } else if (i > 0 && i % 2 === 0) {
                     xOffset = margin;
                     yOffset += cardHeight + margin;
-                } else if (index > 0) {
+                } else if (i > 0) {
                     xOffset += cardWidth + margin;
                 }
 
-                const canvas = document.createElement('canvas');
-                canvas.width = cardWidth * 4;
-                canvas.height = cardHeight * 4;
-                const ctx = canvas.getContext('2d');
-                ctx.scale(4, 4);
+                const canvas = await html2canvas(cards[i]);
+                const imgData = canvas.toDataURL('image/png');
+                pdf.addImage(imgData, 'PNG', xOffset, yOffset, cardWidth, cardHeight);
+            }
 
-                html2canvas(card, { canvas }).then((cardCanvas) => {
-                    pdf.addImage(cardCanvas, 'PNG', xOffset, yOffset, cardWidth, cardHeight);
-                });
-            });
-
-            setTimeout(() => pdf.save('EstimateCards.pdf'), 1000); // Wait for rendering to complete
+            pdf.save('EstimateCards.pdf');
         });
     </script>
 </body>
